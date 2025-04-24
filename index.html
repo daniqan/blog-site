@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog Posts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Add a subtle background */
+        body {
+            background-color: #f9fafb; /* Tailwind gray-50 */
+        }
+        /* Ensure images don't exceed container width */
+        img, svg { /* Apply max-width to SVG as well */
+            max-width: 100%;
+            height: auto;
+        }
+        /* Style for the post container before content loads (optional) */
+        #post-list-container:empty::before {
+            content: "Loading posts...";
+            display: block;
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280; /* Tailwind gray-500 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-indigo-600 shadow-md sticky top-0 z-10">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center py-3">
+                <a href="#" title="Homepage">
+                    <svg class="h-8 w-auto text-white" fill="currentColor" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                       <title>My Awesome Blog Logo</title>
+                       <rect width="100" height="40" rx="5" ry="5" fill="rgba(255,255,255,0.3)" />
+                       <text x="50" y="25" font-family="Inter, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text>
+                    </svg>
+                     </a>
+
+                <nav class="ml-auto flex items-center space-x-4">
+                    <a href="#" title="GitHub Profile" class="text-indigo-100 hover:text-white transition duration-150 ease-in-out">
+                        <span class="sr-only">GitHub</span>
+                        <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                    <a href="#" title="Twitter Profile" class="text-indigo-100 hover:text-white transition duration-150 ease-in-out">
+                         <span class="sr-only">Twitter</span>
+                         <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.775-.023-1.15-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                    </a>
+                    <a href="#" class="text-indigo-100 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div id="post-list-container" class="space-y-8">
+            </div>
+
+    </main>
+
+    <footer class="bg-gray-100 mt-12 py-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            &copy; 2025 My Awesome Blog. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // --- Blog Post Data ---
+        const blogPosts = [
+            {
+                title: "Getting Started with Tailwind CSS",
+                author: "Jane Doe",
+                date: "April 10, 2025",
+                snippet: "Tailwind CSS is a utility-first CSS framework packed with classes like flex, pt-4, text-center...",
+                imageUrl: "https://placehold.co/150x100/a78bfa/ffffff?text=Tailwind",
+                imageAlt: "Tailwind CSS logo placeholder",
+                readMoreUrl: "#" // Replace with actual link
+            },
+            {
+                title: "Understanding JavaScript Promises",
+                author: "John Smith",
+                date: "April 5, 2025",
+                snippet: "Promises provide a cleaner way to handle asynchronous operations in JavaScript compared to traditional callbacks...",
+                imageUrl: "https://placehold.co/150x100/facc15/ffffff?text=JS",
+                imageAlt: "JavaScript logo placeholder",
+                readMoreUrl: "#" // Replace with actual link
+            },
+            {
+                title: "A Guide to Responsive Web Design",
+                author: "Alex Johnson",
+                date: "March 28, 2025",
+                snippet: "With the variety of devices used to access the web today, responsive design is crucial. This guide covers...",
+                imageUrl: "https://placehold.co/150x100/34d399/ffffff?text=Responsive",
+                imageAlt: "Responsive design placeholder",
+                readMoreUrl: "#" // Replace with actual link
+            },
+             {
+                title: "New Post: Introduction to SVGs",
+                author: "Chris Lee",
+                date: "April 11, 2025",
+                snippet: "Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dimensional graphics...",
+                imageUrl: "https://placehold.co/150x100/f87171/ffffff?text=SVG",
+                imageAlt: "SVG placeholder",
+                readMoreUrl: "#" // Replace with actual link
+            }
+        ];
+
+        // --- Function to Render Posts ---
+        function renderPosts() {
+            const container = document.getElementById('post-list-container');
+            if (!container) {
+                console.error("Post container not found!");
+                return;
+            }
+
+            container.innerHTML = ''; // Clear existing content
+
+            blogPosts.forEach(post => {
+                const postHtml = `
+                    <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex items-start space-x-6">
+                        <div class="flex-shrink-0">
+                            <img src="${post.imageUrl}"
+                                 alt="${post.imageAlt}"
+                                 class="w-36 h-24 object-cover rounded-md shadow-sm"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-1">
+                                <a href="${post.readMoreUrl}" class="hover:text-indigo-700">${post.title}</a>
+                            </h3>
+                            <div class="text-sm text-gray-500 mb-2">
+                                <span>By ${post.author}</span> | <span>${post.date}</span>
+                            </div>
+                            <p class="text-gray-700 leading-relaxed mb-3">
+                                ${post.snippet}
+                            </p>
+                            <a href="${post.readMoreUrl}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Read more &rarr;</a>
+                        </div>
+                    </article>
+                `;
+                container.insertAdjacentHTML('beforeend', postHtml);
+            });
+        }
+
+        // --- Initial Render ---
+        document.addEventListener('DOMContentLoaded', renderPosts);
+
+    </script>
+
+</body>
+</html>
