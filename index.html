@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daniqan</title>
+    <title>My Blog Posts</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/marked.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,11 +20,11 @@
             background-color: #f9fafb; /* Tailwind gray-50 */
         }
         /* Ensure images don't exceed container width */
-        img, svg { /* Apply max-width to SVG as well */
+        img, svg {
             max-width: 100%;
             height: auto;
         }
-        /* Style for the post container before content loads (optional) */
+        /* Style for the post container before content loads */
         #post-list-container:empty::before {
             content: "Loading posts...";
             display: block;
@@ -43,8 +45,7 @@
                        <rect width="100" height="40" rx="5" ry="5" fill="rgba(255,255,255,0.3)" />
                        <text x="50" y="25" font-family="Inter, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text>
                     </svg>
-                     </a>
-
+                </a>
                 <nav class="ml-auto flex items-center space-x-4">
                     <a href="#" title="GitHub Profile" class="text-indigo-100 hover:text-white transition duration-150 ease-in-out">
                         <span class="sr-only">GitHub</span>
@@ -61,10 +62,8 @@
     </header>
 
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         <div id="post-list-container" class="space-y-8">
             </div>
-
     </main>
 
     <footer class="bg-gray-100 mt-12 py-6">
@@ -74,45 +73,119 @@
     </footer>
 
     <script>
-        // --- Blog Post Data ---
-        const blogPosts = [
-            {
-                title: "Getting Started with Tailwind CSS",
-                author: "Jane Doe",
-                date: "April 10, 2025",
-                snippet: "Tailwind CSS is a utility-first CSS framework packed with classes like flex, pt-4, text-center...",
-                imageUrl: "https://placehold.co/150x100/a78bfa/ffffff?text=Tailwind",
-                imageAlt: "Tailwind CSS logo placeholder",
-                readMoreUrl: "#" // Replace with actual link
-            },
-            {
-                title: "Understanding JavaScript Promises",
-                author: "John Smith",
-                date: "April 5, 2025",
-                snippet: "Promises provide a cleaner way to handle asynchronous operations in JavaScript compared to traditional callbacks...",
-                imageUrl: "https://placehold.co/150x100/facc15/ffffff?text=JS",
-                imageAlt: "JavaScript logo placeholder",
-                readMoreUrl: "#" // Replace with actual link
-            },
-            {
-                title: "A Guide to Responsive Web Design",
-                author: "Alex Johnson",
-                date: "March 28, 2025",
-                snippet: "With the variety of devices used to access the web today, responsive design is crucial. This guide covers...",
-                imageUrl: "https://placehold.co/150x100/34d399/ffffff?text=Responsive",
-                imageAlt: "Responsive design placeholder",
-                readMoreUrl: "#" // Replace with actual link
-            },
-             {
-                title: "New Post: Introduction to SVGs",
-                author: "Chris Lee",
-                date: "April 11, 2025",
-                snippet: "Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dimensional graphics...",
-                imageUrl: "https://placehold.co/150x100/f87171/ffffff?text=SVG",
-                imageAlt: "SVG placeholder",
-                readMoreUrl: "#" // Replace with actual link
-            }
+        // --- Simulated Markdown Blog Post Data ---
+        // Each string contains YAML front matter and Markdown content.
+        const blogPostMarkdownStrings = [
+`---
+title: "Getting Started with Tailwind CSS"
+author: "Jane Doe"
+date: "April 10, 2025"
+slug: "tailwind-css-intro"
+imageUrl: "https://placehold.co/150x100/a78bfa/ffffff?text=Tailwind"
+imageAlt: "Tailwind CSS logo placeholder"
+snippet: "Tailwind CSS is a utility-first CSS framework packed with classes that can be composed to build any design, directly in your markup."
+tags: ["css", "tailwind", "frontend"]
+---
+Tailwind CSS is a utility-first CSS framework packed with classes like \`flex\`, \`pt-4\`, \`text-center\` and \`rotate-90\` that can be composed to build any design, directly in your markup. It represents a different approach compared to component-based frameworks like Bootstrap or Foundation.
+
+Instead of pre-designed components, Tailwind provides low-level utility classes that let you build completely custom designs without ever leaving your HTML. This can lead to faster development cycles once you get the hang of it.
+
+## Why Use Utility-First?
+Working with utility classes offers several advantages:
+* You aren't wasting energy inventing class names.
+* Your CSS stops growing. Using utilities means most styles are reused.
+* Making changes feels safer. CSS is global, utilities are local.
+
+### Getting Set Up
+The easiest way to get started is using the Tailwind CLI. You can install it via npm:
+\`\`\`bash
+npm install -D tailwindcss
+npx tailwindcss init
+\`\`\`
+This will create a \`tailwind.config.js\` file in your project. You'll need to configure your template paths and then run the CLI tool to scan your files and build your CSS.
+`,
+`---
+title: "Understanding JavaScript Promises"
+author: "John Smith"
+date: "April 5, 2025"
+slug: "js-promises-explained"
+imageUrl: "https://placehold.co/150x100/facc15/ffffff?text=JS"
+imageAlt: "JavaScript logo placeholder"
+snippet: "Promises provide a cleaner way to handle asynchronous operations in JavaScript compared to traditional callbacks. Learn the basics here."
+tags: ["javascript", "async", "es6"]
+---
+Promises are a fundamental part of modern JavaScript, providing a cleaner and more manageable way to handle asynchronous operations compared to traditional callback functions (often leading to "callback hell").
+
+A Promise is an object representing the eventual completion (or failure) of an asynchronous operation and its resulting value.
+
+### States of a Promise
+A Promise can be in one of three states:
+* **Pending:** Initial state, neither fulfilled nor rejected.
+* **Fulfilled (Resolved):** Meaning that the operation completed successfully.
+* **Rejected:** Meaning that the operation failed.
+
+You typically work with promises using \`.then()\` for successful outcomes and \`.catch()\` for errors.
+\`\`\`javascript
+fetch('/api/data')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error fetching data:', error));
+\`\`\`
+Async/await syntax provides an even cleaner way to work with promises.
+`,
+`---
+title: "A Guide to Responsive Web Design"
+author: "Alex Johnson"
+date: "March 28, 2025"
+slug: "responsive-web-design-guide"
+imageUrl: "https://placehold.co/150x100/34d399/ffffff?text=Responsive"
+imageAlt: "Responsive design placeholder"
+snippet: "With the variety of devices used to access the web today, responsive design is crucial. This guide covers the fundamental principles."
+tags: ["css", "rwd", "web design"]
+---
+Responsive Web Design (RWD) is an approach that makes your web pages render well on a variety of devices and window or screen sizes. Content, design, and performance are necessary across all devices to ensure usability and satisfaction.
+
+Key principles include:
+* **Fluid Grids:** Using relative units like percentages, rather than fixed units like pixels, for layout.
+* **Flexible Images:** Ensuring images can scale within their containing elements.
+* **Media Queries:** Applying different CSS rules based on the characteristics of the device (like width, height, orientation).
+
+Tailwind CSS provides excellent utilities for building responsive designs directly in your HTML.
+`,
+`---
+title: "New Post: Introduction to SVGs"
+author: "Chris Lee"
+date: "April 11, 2025"
+slug: "intro-to-svg"
+imageUrl: "https://placehold.co/150x100/f87171/ffffff?text=SVG"
+imageAlt: "SVG placeholder"
+snippet: "Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dimensional graphics. Discover their advantages."
+tags: ["svg", "graphics", "web design"]
+---
+Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dimensional graphics with support for interactivity and animation. Unlike raster images (like JPEGs or PNGs), SVGs are resolution-independent, meaning they look crisp at any size.
+
+### Advantages of SVG:
+* **Scalability:** No quality loss when zoomed or resized.
+* **Small File Sizes:** Especially for simpler graphics.
+* **Editable:** Can be modified with CSS and JavaScript.
+* **Accessible:** Text within SVGs is selectable and searchable.
+`
+            // Add more Markdown strings here for more posts
         ];
+
+        // --- Function to Parse Markdown with Front Matter ---
+        function parseMarkdownWithFrontMatter(markdownString) {
+            const match = markdownString.match(/^---\s*([\s\S]*?)\s*---(\s*[\s\S]*)/);
+            if (match && match[1] && match[2]) {
+                const frontMatter = jsyaml.load(match[1]);
+                const content = match[2].trim(); // The rest is Markdown content
+                return { frontMatter, content };
+            }
+            // Fallback if no front matter is found (or parsing error)
+            console.warn("Could not parse front matter for a post. Treating entire string as content (or skipping).");
+            return { frontMatter: {}, content: markdownString }; // Or handle error more gracefully
+        }
+
 
         // --- Function to Render Posts ---
         function renderPosts() {
@@ -121,39 +194,70 @@
                 console.error("Post container not found!");
                 return;
             }
+            if (typeof jsyaml === 'undefined') {
+                console.error("js-yaml library not loaded!");
+                container.innerHTML = '<p class="text-red-500 text-center">Error: YAML parser not loaded.</p>';
+                return;
+            }
+             if (typeof marked === 'undefined') {
+                console.error("Marked.js library not loaded!");
+                container.innerHTML = '<p class="text-red-500 text-center">Error: Markdown parser not loaded.</p>';
+                return;
+            }
+
 
             container.innerHTML = ''; // Clear existing content
 
-            blogPosts.forEach(post => {
-                const postHtml = `
-                    <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex items-start space-x-6">
-                        <div class="flex-shrink-0">
-                            <img src="${post.imageUrl}"
-                                 alt="${post.imageAlt}"
-                                 class="w-36 h-24 object-cover rounded-md shadow-sm"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
-                        </div>
-                        <div class="flex-grow">
-                            <h3 class="text-xl font-semibold text-gray-800 mb-1">
-                                <a href="${post.readMoreUrl}" class="hover:text-indigo-700">${post.title}</a>
-                            </h3>
-                            <div class="text-sm text-gray-500 mb-2">
-                                <span>By ${post.author}</span> | <span>${post.date}</span>
+            blogPostMarkdownStrings.forEach((mdString, index) => {
+                try {
+                    const { frontMatter: post, content: markdownContent } = parseMarkdownWithFrontMatter(mdString);
+
+                    // If essential front matter is missing, skip or show an error
+                    if (!post.title || !post.slug) {
+                        console.warn(`Skipping post at index ${index} due to missing title or slug.`);
+                        return; // continue to next iteration
+                    }
+
+                    // Store the full markdown content with the post object if needed later for detail page
+                    // For now, the detail page would re-parse, or you'd pass this data.
+                    // post.fullMarkdownContent = markdownContent;
+
+
+                    const readMoreUrl = `post-detail.html?slug=${post.slug}`;
+
+                    const postHtml = `
+                        <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex items-start space-x-6">
+                            <div class="flex-shrink-0">
+                                <img src="${post.imageUrl || 'https://placehold.co/150x100/cccccc/ffffff?text=No+Image'}"
+                                     alt="${post.imageAlt || 'Blog post image'}"
+                                     class="w-36 h-24 object-cover rounded-md shadow-sm"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
                             </div>
-                            <p class="text-gray-700 leading-relaxed mb-3">
-                                ${post.snippet}
-                            </p>
-                            <a href="${post.readMoreUrl}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Read more &rarr;</a>
-                        </div>
-                    </article>
-                `;
-                container.insertAdjacentHTML('beforeend', postHtml);
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-1">
+                                    <a href="${readMoreUrl}" class="hover:text-indigo-700">${post.title}</a>
+                                </h3>
+                                <div class="text-sm text-gray-500 mb-2">
+                                    <span>By ${post.author || 'Unknown Author'}</span> | <span>${post.date || 'No Date'}</span>
+                                </div>
+                                <p class="text-gray-700 leading-relaxed mb-3">
+                                    ${post.snippet || 'No snippet available.'}
+                                </p>
+                                <a href="${readMoreUrl}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Read more &rarr;</a>
+                            </div>
+                        </article>
+                    `;
+                    container.insertAdjacentHTML('beforeend', postHtml);
+                } catch (e) {
+                    console.error("Error processing Markdown/YAML for a post: ", e);
+                    const errorHtml = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">Error loading one of the posts. Check console.</div>`;
+                    container.insertAdjacentHTML('beforeend', errorHtml);
+                }
             });
         }
 
         // --- Initial Render ---
         document.addEventListener('DOMContentLoaded', renderPosts);
-
     </script>
 
 </body>
