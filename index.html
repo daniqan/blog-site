@@ -33,7 +33,7 @@
             color: #6b7280; /* Tailwind gray-500 */
         }
 
-        /* Basic prose styling for post content (copied from sample detail page) */
+        /* Basic prose styling for post content */
         .prose p { margin-bottom: 1em; }
         .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 { margin-bottom: 0.8em; line-height: 1.3; }
         .prose h1 { margin-top: 0; font-size: 2.25em; font-weight: 700;}
@@ -227,6 +227,7 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
                     // Store full markdown for later use by toggle function
                     fullMarkdownBySlug[postData.slug] = markdownContent;
 
+                    // MODIFIED: Removed the HTML comment from inside full-post-content div
                     const postHtml = `
                         <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
                             <div class="flex items-start space-x-6">
@@ -246,8 +247,7 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
                                     <p class="post-snippet text-gray-700 leading-relaxed mb-3">
                                         ${postData.snippet || 'No snippet available.'}
                                     </p>
-                                    <div class="full-post-content prose prose-indigo max-w-none mt-4 hidden">
-                                        </div>
+                                    <div class="full-post-content prose prose-indigo max-w-none mt-4 hidden"></div>
                                     <button data-slug="${postData.slug}" class="read-more-btn text-indigo-600 hover:text-indigo-800 font-medium text-sm mt-2">
                                         Read more &rarr;
                                     </button>
@@ -279,7 +279,8 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
 
             if (isHidden) {
                 // Expand: Show full content, hide snippet
-                if (fullContentElement.innerHTML === '') { // Only parse and set if not already loaded
+                // Use trim() for the check to ensure it works even if the div contained whitespace.
+                if (fullContentElement.innerHTML.trim() === '') { // Only parse and set if not already loaded
                     const markdown = fullMarkdownBySlug[slug];
                     if (markdown) {
                         fullContentElement.innerHTML = marked.parse(markdown);
