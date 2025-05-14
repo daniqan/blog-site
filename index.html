@@ -32,6 +32,25 @@
             padding: 2rem;
             color: #6b7280; /* Tailwind gray-500 */
         }
+
+        /* Basic prose styling for post content (copied from sample detail page) */
+        .prose p { margin-bottom: 1em; }
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 { margin-bottom: 0.8em; line-height: 1.3; }
+        .prose h1 { margin-top: 0; font-size: 2.25em; font-weight: 700;}
+        .prose h2 { margin-top: 1.5em; font-size: 1.75em; font-weight: 600; }
+        .prose h3 { margin-top: 1.2em; font-size: 1.375em; font-weight: 600; }
+        .prose a { color: #4f46e5; /* Tailwind indigo-600 */ text-decoration: underline; }
+        .prose a:hover { color: #3730a3; /* Tailwind indigo-800 */ }
+        .prose ul, .prose ol { margin-left: 1.5em; margin-bottom: 1em; }
+        .prose ul { list-style: disc; }
+        .prose ol { list-style: decimal; }
+        .prose li > p { margin-bottom: 0.5em; } /* Tighter spacing for p inside li */
+        .prose code { background-color: #e5e7eb; /* Tailwind gray-200 */ padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.9em; }
+        .prose pre { background-color: #1f2937; /* Tailwind gray-800 */ color: #f3f4f6; /* Tailwind gray-100 */ padding: 1em; border-radius: 0.375rem; overflow-x: auto; margin-bottom: 1em;}
+        .prose pre code { background-color: transparent; padding: 0; color: inherit; font-size: inherit; }
+        .prose blockquote { border-left: 4px solid #d1d5db; /* Tailwind gray-300 */ padding-left: 1em; margin-left: 0; margin-right: 0; font-style: italic; color: #4b5563; /* Tailwind gray-600 */ }
+        .prose img { margin-top: 1.5em; margin-bottom: 1.5em; border-radius: 0.375rem; } /* Style images in prose */
+        .prose hr { border-top: 1px solid #e5e7eb; margin-top: 2em; margin-bottom: 2em; }
     </style>
 </head>
 <body class="antialiased">
@@ -74,7 +93,6 @@
 
     <script>
         // --- Simulated Markdown Blog Post Data ---
-        // Each string contains YAML front matter and Markdown content.
         const blogPostMarkdownStrings = [
 `---
 title: "Getting Started with Tailwind CSS"
@@ -170,80 +188,70 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
 * **Editable:** Can be modified with CSS and JavaScript.
 * **Accessible:** Text within SVGs is selectable and searchable.
 `
-            // Add more Markdown strings here for more posts
         ];
+
+        // Store full markdown content by slug for easy retrieval
+        const fullMarkdownBySlug = {};
 
         // --- Function to Parse Markdown with Front Matter ---
         function parseMarkdownWithFrontMatter(markdownString) {
             const match = markdownString.match(/^---\s*([\s\S]*?)\s*---(\s*[\s\S]*)/);
             if (match && match[1] && match[2]) {
                 const frontMatter = jsyaml.load(match[1]);
-                const content = match[2].trim(); // The rest is Markdown content
+                const content = match[2].trim();
                 return { frontMatter, content };
             }
-            // Fallback if no front matter is found (or parsing error)
-            console.warn("Could not parse front matter for a post. Treating entire string as content (or skipping).");
-            return { frontMatter: {}, content: markdownString }; // Or handle error more gracefully
+            console.warn("Could not parse front matter for a post.");
+            return { frontMatter: {}, content: markdownString };
         }
-
 
         // --- Function to Render Posts ---
         function renderPosts() {
             const container = document.getElementById('post-list-container');
-            if (!container) {
-                console.error("Post container not found!");
-                return;
-            }
-            if (typeof jsyaml === 'undefined') {
-                console.error("js-yaml library not loaded!");
-                container.innerHTML = '<p class="text-red-500 text-center">Error: YAML parser not loaded.</p>';
-                return;
-            }
-             if (typeof marked === 'undefined') {
-                console.error("Marked.js library not loaded!");
-                container.innerHTML = '<p class="text-red-500 text-center">Error: Markdown parser not loaded.</p>';
-                return;
-            }
-
+            // Check for library and container existence
+            if (!container) { console.error("Post container not found!"); return; }
+            if (typeof jsyaml === 'undefined') { console.error("js-yaml library not loaded!"); container.innerHTML = '<p class="text-red-500 text-center">Error: YAML parser not loaded.</p>'; return; }
+            if (typeof marked === 'undefined') { console.error("Marked.js library not loaded!"); container.innerHTML = '<p class="text-red-500 text-center">Error: Markdown parser not loaded.</p>'; return; }
 
             container.innerHTML = ''; // Clear existing content
 
             blogPostMarkdownStrings.forEach((mdString, index) => {
                 try {
-                    const { frontMatter: post, content: markdownContent } = parseMarkdownWithFrontMatter(mdString);
+                    const { frontMatter: postData, content: markdownContent } = parseMarkdownWithFrontMatter(mdString);
 
-                    // If essential front matter is missing, skip or show an error
-                    if (!post.title || !post.slug) {
+                    if (!postData.title || !postData.slug) {
                         console.warn(`Skipping post at index ${index} due to missing title or slug.`);
-                        return; // continue to next iteration
+                        return;
                     }
 
-                    // Store the full markdown content with the post object if needed later for detail page
-                    // For now, the detail page would re-parse, or you'd pass this data.
-                    // post.fullMarkdownContent = markdownContent;
-
-
-                    const readMoreUrl = `post-detail.html?slug=${post.slug}`;
+                    // Store full markdown for later use by toggle function
+                    fullMarkdownBySlug[postData.slug] = markdownContent;
 
                     const postHtml = `
-                        <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex items-start space-x-6">
-                            <div class="flex-shrink-0">
-                                <img src="${post.imageUrl || 'https://placehold.co/150x100/cccccc/ffffff?text=No+Image'}"
-                                     alt="${post.imageAlt || 'Blog post image'}"
-                                     class="w-36 h-24 object-cover rounded-md shadow-sm"
-                                     onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
-                            </div>
-                            <div class="flex-grow">
-                                <h3 class="text-xl font-semibold text-gray-800 mb-1">
-                                    <a href="${readMoreUrl}" class="hover:text-indigo-700">${post.title}</a>
-                                </h3>
-                                <div class="text-sm text-gray-500 mb-2">
-                                    <span>By ${post.author || 'Unknown Author'}</span> | <span>${post.date || 'No Date'}</span>
+                        <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
+                            <div class="flex items-start space-x-6">
+                                <div class="flex-shrink-0">
+                                    <img src="${postData.imageUrl || 'https://placehold.co/150x100/cccccc/ffffff?text=No+Image'}"
+                                         alt="${postData.imageAlt || 'Blog post image'}"
+                                         class="w-36 h-24 object-cover rounded-md shadow-sm"
+                                         onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
                                 </div>
-                                <p class="text-gray-700 leading-relaxed mb-3">
-                                    ${post.snippet || 'No snippet available.'}
-                                </p>
-                                <a href="${readMoreUrl}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Read more &rarr;</a>
+                                <div class="flex-grow">
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-1">
+                                        ${postData.title}
+                                    </h3>
+                                    <div class="text-sm text-gray-500 mb-2">
+                                        <span>By ${postData.author || 'Unknown Author'}</span> | <span>${postData.date || 'No Date'}</span>
+                                    </div>
+                                    <p class="post-snippet text-gray-700 leading-relaxed mb-3">
+                                        ${postData.snippet || 'No snippet available.'}
+                                    </p>
+                                    <div class="full-post-content prose prose-indigo max-w-none mt-4 hidden">
+                                        </div>
+                                    <button data-slug="${postData.slug}" class="read-more-btn text-indigo-600 hover:text-indigo-800 font-medium text-sm mt-2">
+                                        Read more &rarr;
+                                    </button>
+                                </div>
                             </div>
                         </article>
                     `;
@@ -256,8 +264,53 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
             });
         }
 
-        // --- Initial Render ---
-        document.addEventListener('DOMContentLoaded', renderPosts);
+        // --- Function to Toggle Full Post Display ---
+        function toggleFullPost(buttonElement) {
+            const slug = buttonElement.dataset.slug;
+            const articleElement = buttonElement.closest('article');
+            if (!articleElement) return;
+
+            const snippetElement = articleElement.querySelector('.post-snippet');
+            const fullContentElement = articleElement.querySelector('.full-post-content');
+
+            if (!snippetElement || !fullContentElement) return;
+
+            const isHidden = fullContentElement.classList.contains('hidden');
+
+            if (isHidden) {
+                // Expand: Show full content, hide snippet
+                if (fullContentElement.innerHTML === '') { // Only parse and set if not already loaded
+                    const markdown = fullMarkdownBySlug[slug];
+                    if (markdown) {
+                        fullContentElement.innerHTML = marked.parse(markdown);
+                    } else {
+                        fullContentElement.innerHTML = "<p>Full content not found.</p>";
+                    }
+                }
+                fullContentElement.classList.remove('hidden');
+                snippetElement.classList.add('hidden');
+                buttonElement.innerHTML = '&larr; Read less';
+            } else {
+                // Collapse: Hide full content, show snippet
+                fullContentElement.classList.add('hidden');
+                snippetElement.classList.remove('hidden');
+                buttonElement.innerHTML = 'Read more &rarr;';
+            }
+        }
+
+        // --- Event Listener for "Read more" buttons (using event delegation) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPosts(); // Initial render of post previews
+
+            const postListContainer = document.getElementById('post-list-container');
+            if (postListContainer) {
+                postListContainer.addEventListener('click', function(event) {
+                    if (event.target.classList.contains('read-more-btn')) {
+                        toggleFullPost(event.target);
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
