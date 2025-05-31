@@ -44,13 +44,48 @@
         .prose ul, .prose ol { margin-left: 1.5em; margin-bottom: 1em; }
         .prose ul { list-style: disc; }
         .prose ol { list-style: decimal; }
-        .prose li > p { margin-bottom: 0.5em; } /* Tighter spacing for p inside li */
-        .prose code { background-color: #e5e7eb; /* Tailwind gray-200 */ padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.9em; }
-        .prose pre { background-color: #1f2937; /* Tailwind gray-800 */ color: #f3f4f6; /* Tailwind gray-100 */ padding: 1em; border-radius: 0.375rem; overflow-x: auto; margin-bottom: 1em;}
+        .prose li > p { margin-bottom: 0.5em; }
+        .prose code { background-color: #e5e7eb; padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.9em; }
+        .prose pre { background-color: #1f2937; color: #f3f4f6; padding: 1em; border-radius: 0.375rem; overflow-x: auto; margin-bottom: 1em;}
         .prose pre code { background-color: transparent; padding: 0; color: inherit; font-size: inherit; }
-        .prose blockquote { border-left: 4px solid #d1d5db; /* Tailwind gray-300 */ padding-left: 1em; margin-left: 0; margin-right: 0; font-style: italic; color: #4b5563; /* Tailwind gray-600 */ }
-        .prose img { margin-top: 1.5em; margin-bottom: 1.5em; border-radius: 0.375rem; } /* Style images in prose */
+        .prose blockquote { border-left: 4px solid #d1d5db; padding-left: 1em; margin-left: 0; margin-right: 0; font-style: italic; color: #4b5563; }
+        .prose img { margin-top: 1.5em; margin-bottom: 1.5em; border-radius: 0.375rem; }
         .prose hr { border-top: 1px solid #e5e7eb; margin-top: 2em; margin-bottom: 2em; }
+
+        /* Animation and Layout Styles */
+        .post-image-wrapper {
+            transition: margin-bottom 0.5s ease-in-out, width 0.5s ease-in-out;
+        }
+        .post-image {
+            transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
+        }
+        .post-card-inner-flex {
+            transition: flex-direction 0.1s 0s ease-in-out; /* Quick transition for layout change */
+        }
+
+        /* When article has .expanded-view class */
+        .expanded-view .post-card-inner-flex {
+            flex-direction: column;
+            align-items: stretch; /* Make children take full width */
+        }
+
+        .expanded-view .post-image-wrapper {
+            width: 100%; /* Take full width to allow image centering */
+            margin-bottom: 1.5rem; /* Space below expanded image */
+            flex-shrink: 0; /* Ensure it doesn't shrink if flex properties were different */
+        }
+
+        .expanded-view .post-image {
+            width: 60%; /* Enlarge the image */
+            max-width: 350px; /* Max size for the enlarged image */
+            height: auto; /* Maintain aspect ratio */
+            margin-left: auto;
+            margin-right: auto;
+            display: block; /* Crucial for margin auto centering */
+        }
+        .expanded-view .post-card-inner-flex > .flex-grow {
+             /* The text container will naturally take full width */
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -208,7 +243,6 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
         // --- Function to Render Posts ---
         function renderPosts() {
             const container = document.getElementById('post-list-container');
-            // Check for library and container existence
             if (!container) { console.error("Post container not found!"); return; }
             if (typeof jsyaml === 'undefined') { console.error("js-yaml library not loaded!"); container.innerHTML = '<p class="text-red-500 text-center">Error: YAML parser not loaded.</p>'; return; }
             if (typeof marked === 'undefined') { console.error("Marked.js library not loaded!"); container.innerHTML = '<p class="text-red-500 text-center">Error: Markdown parser not loaded.</p>'; return; }
@@ -223,19 +257,15 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
                         console.warn(`Skipping post at index ${index} due to missing title or slug.`);
                         return;
                     }
-
-                    // Store full markdown for later use by toggle function
                     fullMarkdownBySlug[postData.slug] = markdownContent;
 
-                    // MODIFIED: Removed the HTML comment from inside full-post-content div
                     const postHtml = `
                         <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
-                            <div class="flex items-start space-x-6">
-                                <div class="flex-shrink-0">
+                            <div class="post-card-inner-flex flex items-start space-x-6">
+                                <div class="post-image-wrapper flex-shrink-0">
                                     <img src="${postData.imageUrl || 'https://placehold.co/150x100/cccccc/ffffff?text=No+Image'}"
                                          alt="${postData.imageAlt || 'Blog post image'}"
-                                         class="w-36 h-24 object-cover rounded-md shadow-sm"
-                                         onerror="this.onerror=null; this.src='https://placehold.co/150x100/cccccc/ffffff?text=Image+Error';">
+                                         class="post-image w-36 h-24 object-cover rounded-md shadow-sm">
                                 </div>
                                 <div class="flex-grow">
                                     <h3 class="text-xl font-semibold text-gray-800 mb-1">
@@ -258,8 +288,7 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
                     container.insertAdjacentHTML('beforeend', postHtml);
                 } catch (e) {
                     console.error("Error processing Markdown/YAML for a post: ", e);
-                    const errorHtml = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">Error loading one of the posts. Check console.</div>`;
-                    container.insertAdjacentHTML('beforeend', errorHtml);
+                    // Error display in UI can be added here if desired
                 }
             });
         }
@@ -275,12 +304,12 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
 
             if (!snippetElement || !fullContentElement) return;
 
-            const isHidden = fullContentElement.classList.contains('hidden');
+            const isExpanding = fullContentElement.classList.contains('hidden');
+            articleElement.classList.toggle('expanded-view', isExpanding);
 
-            if (isHidden) {
-                // Expand: Show full content, hide snippet
-                // Use trim() for the check to ensure it works even if the div contained whitespace.
-                if (fullContentElement.innerHTML.trim() === '') { // Only parse and set if not already loaded
+
+            if (isExpanding) {
+                if (fullContentElement.innerHTML.trim() === '') {
                     const markdown = fullMarkdownBySlug[slug];
                     if (markdown) {
                         fullContentElement.innerHTML = marked.parse(markdown);
@@ -292,17 +321,15 @@ Scalable Vector Graphics (SVG) are an XML-based vector image format for two-dime
                 snippetElement.classList.add('hidden');
                 buttonElement.innerHTML = '&larr; Read less';
             } else {
-                // Collapse: Hide full content, show snippet
                 fullContentElement.classList.add('hidden');
                 snippetElement.classList.remove('hidden');
                 buttonElement.innerHTML = 'Read more &rarr;';
             }
         }
 
-        // --- Event Listener for "Read more" buttons (using event delegation) ---
+        // --- Event Listener for "Read more" buttons ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderPosts(); // Initial render of post previews
-
+            renderPosts();
             const postListContainer = document.getElementById('post-list-container');
             if (postListContainer) {
                 postListContainer.addEventListener('click', function(event) {
